@@ -1,5 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import time, threading, requests, os
+import time, threading, requests, os, pyautogui, base64, io
 
 from pynput import keyboard
 
@@ -27,17 +27,22 @@ class httpServer(BaseHTTPRequestHandler):
         if(self.headers['isNewImage'] == '1'):
             print("new image")
 
-        content_len = int(self.headers.get('Content-Length'))
-        post_raw= str(self.rfile.read(content_len))
-        post_str = str(post_raw[3:-2])
+        content_len = 2
+        post_raw_str = ""
+        post_raw = 0
+        while(post_raw != "b\'~\'"):
+            post_raw= str(self.rfile.read(1))
+            post_raw_str = post_raw_str + post_raw[2]
+            
+        post_str = post_raw_str
         post_type = post_str[0:post_str.find(":")]
         post_data = post_str[post_str.find(":")+1:]
-        print(post_raw)
 
         if(post_type == "i"):
             print("new image")
             ret = "new image added"
             image_str = post_data
+            
 
         if(post_type == "cp"):
             print("new cursor position")
@@ -67,7 +72,6 @@ class httpServer(BaseHTTPRequestHandler):
 
 def on_press(key):
     global httpd
-    print(str(key))
     if(str(key) == "Key.up"):
         httpd.shutdown()
         print("server = false")
