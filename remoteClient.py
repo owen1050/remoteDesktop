@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 data = ""
 render = ""
 img = ""
+lastMouseSend = time.time()
 class Window(Frame):
     def __init__(self, master=None):
         global data, render, img
@@ -30,8 +31,18 @@ def updateImg():
     im = Image.open(BytesIO(base64.b64decode(data)))        
     render = ImageTk.PhotoImage(im)
     img.config(image = render)
-    root.after(250,updateImg)
+    root.after(500,updateImg)
     print("RAN")
+
+def motion(event):
+    global lastMouseSend
+    if(time.time() - lastMouseSend > 0.5):
+
+        url = "http://127.0.0.1:23655"
+        send = "cp:" + str(event.x)+"," + str(event.y) + "~"
+        r = requests.post(url, data =  {send.encode()})
+        print(r.text)
+        lastMouseSend = time.time()
 
 url = "http://127.0.0.1:23655"
 r = requests.get(url, data =  {"i:~".encode()})
@@ -41,6 +52,7 @@ root = Tk()
 
 app = Window(root)
 root.after(1000,updateImg)
+root.bind('<Motion>', motion)
 root.wm_title("Tkinter window")
 root.geometry("200x120")
 root.mainloop()

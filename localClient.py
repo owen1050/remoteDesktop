@@ -1,9 +1,9 @@
 import requests, pyautogui, base64, io, time
 
 url = "http://127.0.0.1:23655"
-
+t0 = 0
 while(True):
-	if(True):
+	if(time.time() - t0 >1):
 		t01 = time.time()
 		ss = pyautogui.screenshot()
 

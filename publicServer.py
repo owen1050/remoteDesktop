@@ -63,7 +63,7 @@ class httpServer(BaseHTTPRequestHandler):
         if(post_type == "cp"):
             print("new cursor position")
             cursor_pos_x = int(post_data[0:post_data.find(",")])
-            cursor_pos_y = int(post_data[post_data.find(",")+1:])
+            cursor_pos_y = int(post_data[post_data.find(",")+1:post_data.find("~")])
             print(cursor_pos_x)
             print(cursor_pos_y)
             ret = "New cursor pos set to " + str(cursor_pos_x) + ":" + str(cursor_pos_y)
