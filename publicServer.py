@@ -1,6 +1,11 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time, threading, requests, os
 
+from pynput import keyboard
+
+runServer = True
+htpd = 1
+
 class httpServer(BaseHTTPRequestHandler):
     image_str = ""
     to_click = False
@@ -27,7 +32,7 @@ class httpServer(BaseHTTPRequestHandler):
         post_str = str(post_raw[3:-2])
         post_type = post_str[0:post_str.find(":")]
         post_data = post_str[post_str.find(":")+1:]
-        #print(post_data)
+        print(post_raw)
 
         if(post_type == "i"):
             print("new image")
@@ -60,13 +65,23 @@ class httpServer(BaseHTTPRequestHandler):
         self.wfile.write(ret.encode())
 
 
+def on_press(key):
+    global httpd
+    print(str(key))
+    if(str(key) == "Key.up"):
+        httpd.shutdown()
+        print("server = false")
+
+
 def run():
+    global httpd
     httpd = HTTPServer(('', 23655), httpServer)
     print ("Starting http server on 23655")
-    try:         
-        httpd.serve_forever()     
-    except:         
-        httpd.shutdown()         
-        print("Shutdown server") 
+    httpd.serve_forever()     
+    print("Shutdown server") 
 
+
+listener = keyboard.Listener(
+    on_press=on_press)
+listener.start()
 run()
