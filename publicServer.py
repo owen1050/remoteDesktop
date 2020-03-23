@@ -5,29 +5,45 @@ from pynput import keyboard
 
 runServer = True
 htpd = 1
+image_str = ""
+to_click = False
+click_pos_x = 0
+click_pos_y = 0
+cursor_pos_x = 0
+cursor_pos_y = 0
 
 class httpServer(BaseHTTPRequestHandler):
-    image_str = ""
-    to_click = False
-    click_pos_x = 0
-    click_pos_y = 0
-    cursor_pos_x = 0
-    cursor_pos_y = 0
+    
     
 
     def do_GET(self):
+        global image_str, to_click, click_pos_x, click_pos_y, cursor_pos_x, cursor_pos_y
         self.send_response(200)
         self.send_header("content-type", "text/plain")
         self.end_headers()
-        self.wfile.write("Get up test".encode())
+
+        ret = ""
+        
+        post_raw_str = ""
+        post_raw = 0
+        while(post_raw != "b\'~\'"):
+            post_raw= str(self.rfile.read(1))
+            post_raw_str = post_raw_str + post_raw[2]
+            
+        post_str = post_raw_str
+        post_type = post_str[0:post_str.find(":")]
+        post_data = post_str[post_str.find(":")+1:]
+
+        if(post_type == "i"):
+            print("new image")
+            ret = image_str
+
+        self.wfile.write(ret.encode())
 
     def do_POST(self):
+        global image_str, to_click, click_pos_x, click_pos_y, cursor_pos_x, cursor_pos_y
         ret = ""
 
-        if(self.headers['isNewImage'] == '1'):
-            print("new image")
-
-        content_len = 2
         post_raw_str = ""
         post_raw = 0
         while(post_raw != "b\'~\'"):
@@ -42,7 +58,7 @@ class httpServer(BaseHTTPRequestHandler):
             print("new image")
             ret = "new image added"
             image_str = post_data
-            
+
 
         if(post_type == "cp"):
             print("new cursor position")
